@@ -36,3 +36,29 @@ contract ImplementationV2 is Implementation {
         return magicString;
     }
 }
+
+struct MyStruct {
+    uint256 magicNumber;
+    string magicString;
+}
+
+contract ImplementationV3 is UUPSUpgradeable, OwnableUpgradeable {
+    MyStruct myStruct;
+
+    function setMyStruct(
+        uint256 newMagicNumber,
+        string memory newMagicString
+    ) public {
+        myStruct = MyStruct(newMagicNumber, newMagicString);
+    }
+
+    function getMyStruct() public view returns (uint256, string memory) {
+        return (myStruct.magicNumber, myStruct.magicString);
+    }
+
+    function _authorizeUpgrade(address) internal view override {
+        if (msg.sender != owner()) {
+            revert OwnableUnauthorizedAccount(msg.sender);
+        }
+    }
+}
