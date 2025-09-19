@@ -62,3 +62,41 @@ contract ImplementationV3 is UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 }
+
+contract ImplementationV4 is UUPSUpgradeable, OwnableUpgradeable {
+    /// @notice Store a mapping of address to its MyStruct
+    mapping(address => MyStruct) private myStructs;
+
+    /// @notice Set struct for the sender
+    function setMyStruct(
+        uint256 newMagicNumber,
+        string memory newMagicString
+    ) public {
+        myStructs[msg.sender] = MyStruct(newMagicNumber, newMagicString);
+    }
+
+    /// @notice Get struct for the sender
+    function getMyStruct()
+        public
+        view
+        returns (uint256, string memory, address)
+    {
+        MyStruct storage s = myStructs[msg.sender];
+        return (s.magicNumber, s.magicString, msg.sender);
+    }
+
+    /// @notice Get struct for any address
+    function getMyStructOf(
+        address account
+    ) public view returns (uint256, string memory, address) {
+        MyStruct storage s = myStructs[account];
+        return (s.magicNumber, s.magicString, account);
+    }
+
+    /// @notice Upgrade authorization
+    function _authorizeUpgrade(address) internal view override {
+        if (msg.sender != owner()) {
+            revert OwnableUnauthorizedAccount(msg.sender);
+        }
+    }
+}
